@@ -15,16 +15,34 @@ import useSWR from 'swr';
 import Error from 'next/error';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import {useAtom} from "jotai";
+import { favoritesAtom} from "@/store";
+import { useState } from "react";
 import Link from 'next/link';
 
 const fetcher = url => fetch(url).then(res => res.json());
 
 const ArtworkCard = ({ objectID }) => {
-  const { data, error } = useSWR(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}`, fetcher);
+  const { data, error } = useSWR(objectID ? `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}` : null, fetcher);
+  const [favoritesList, setFavoritesList] = useAtom(favoritesAtom)
+  const [showAdded, setShowAdded] = useState(favoritesList.includes(objectID))
 
   if (error) return <Error statusCode={404} />;
   if (!data) return null;
   const {primaryImage, artistDisplayName, artistWikidata_URL,creditLine, dimensions ,title, objectDate, classification, medium} = data;
+
+
+  const favoritesClicked = () => {
+    console.log("FAVORITES CLICKED")
+    if(showAdded) {
+      console.log("Favorites REMOVED")
+      setFavoritesList(current => current.filter(fav => fav != objectID));
+    } else {
+      console.log("Favorite ADDED");
+      setFavoritesList(current => [...current, objectID]);
+    }
+    setShowAdded(!showAdded);
+  }
 
   return (
     <Card>
@@ -39,6 +57,9 @@ const ArtworkCard = ({ objectID }) => {
             Credit Line: {creditLine || 'N/A'}<br />
             Dimensions: {dimensions || 'N/A'}<br />
         </Card.Text>
+        <button variant = {showAdded ? "primary" : "outline-primary"} onClick={favoritesClicked}>
+          {showAdded ? "+ Favorite (added)" : "+ Favorite"}
+        </button>
       </Card.Body>
     </Card>
   );

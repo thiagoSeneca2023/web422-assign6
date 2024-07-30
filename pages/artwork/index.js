@@ -16,15 +16,16 @@ import {useRouter} from 'next/router';
 import ArtworkCard from '@/components/ArtworkCard';
 import { Row, Col, Card, Pagination } from 'react-bootstrap';
 import Error from "next/error"
+import validObjectIDList from '@/public/data/validObjectIDList.json'
 
 const PER_PAGE = 12;
 
 export default function ArtworkExplorer({}) {
-    const [artworkList, setArtworkList] = useState([]);
-    const [page, setPage] = useState(1);
+    const [artworkList, setArtworkList] = useState([]); //might not need
+    const [page, setPage] = useState(1);          //might not need
 
-    const router = useRouter();
-    let finalQuery = router.asPath.split('?')[1];
+    const router = useRouter();                   //might not need
+    let finalQuery = router.asPath.split('?')[1]; //might not need
 
     const { data, error } = useSWR(`https://collectionapi.metmuseum.org/public/collection/v1/search?${finalQuery}`)
 
@@ -42,11 +43,12 @@ export default function ArtworkExplorer({}) {
 
     useEffect(() => {
         if (data && data.objectIDs) {
+          let filteredResults = validObjectIDList.objectIDs.filter(x => data.objectIDs?.includes(x));
           let results = [];
-          for (let i = 0; i < data.objectIDs.length; i += PER_PAGE) {
-            const chunk = data?.objectIDs.slice(i, i + PER_PAGE);
+          for (let i = 0; i < filteredResults.length; i += PER_PAGE) {
+            const chunk = filteredResults.slice(i, i + PER_PAGE);
             results.push(chunk);
-          }
+        }        
           setArtworkList(results);
           setPage(1);
         }
