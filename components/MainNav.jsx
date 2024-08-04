@@ -14,7 +14,8 @@ import Link from 'next/link';
 import {Container, NavDropdown, Nav, Navbar, Form, Button} from 'react-bootstrap'
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import {useAtom} from "jotai";
+import { useAtom } from "jotai";
+import { addToHistory } from '@/lib/userData';
 import { searchHistoryAtom } from "@/store";
 import { useForm } from 'react-hook-form';
 
@@ -27,11 +28,11 @@ function navbar() {
 
 
   //TODO might need more work
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
     setIsExpanded(false);
     let queryString = `/artwork?title=true&q=${searchField}`;
-    setSearchHistory(current => [...current, queryString]);
+    setSearchHistory(await addToHistory(`title=true&q=${queryString}`));
     router.push(queryString);
   }
 

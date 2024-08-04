@@ -17,29 +17,34 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import {useAtom} from "jotai";
 import { favoritesAtom} from "@/store";
-import { useState } from "react";
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { addToFavorites, removeFromFavorites } from '@/lib/userData';
 
 const fetcher = url => fetch(url).then(res => res.json());
 
 const ArtworkCard = ({ objectID }) => {
   const { data, error } = useSWR(objectID ? `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}` : null, fetcher);
   const [favoritesList, setFavoritesList] = useAtom(favoritesAtom)
-  const [showAdded, setShowAdded] = useState(favoritesList.includes(objectID))
+  const [showAdded, setShowAdded] = useState(false)
+
+  useEffect(()=>{
+    setShowAdded(favoritesList?.includes(objectID))
+  }, [favoritesList])
+
 
   if (error) return <Error statusCode={404} />;
   if (!data) return null;
   const {primaryImage, artistDisplayName, artistWikidata_URL,creditLine, dimensions ,title, objectDate, classification, medium} = data;
 
 
-  const favoritesClicked = () => {
+  const favoritesClicked = async () => {
     console.log("FAVORITES CLICKED")
     if(showAdded) {
       console.log("Favorites REMOVED")
-      setFavoritesList(current => current.filter(fav => fav != objectID));
+      setFavoritesList(await removeFromFavorites(objectID));
     } else {
       console.log("Favorite ADDED");
-      setFavoritesList(current => [...current, objectID]);
+      setFavoritesList(await addToFavorites(objectID));
     }
     setShowAdded(!showAdded);
   }

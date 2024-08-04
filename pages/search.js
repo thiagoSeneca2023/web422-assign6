@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useAtom } from 'jotai';
 import { searchHistoryAtom } from '@/store';
+import { addToHistory } from '@/lib/userData';
 
 export default function AdvancedSearch() {
 
@@ -22,25 +23,25 @@ export default function AdvancedSearch() {
     const [searchHistory, setSearchHistory] = useAtom(searchHistoryAtom);
     const { register, handleSubmit } = useForm();
 
-    const submitForm = (data) => {
-    let queryString = `${data.searchBy}=true`;
+    const submitForm = async (data) => {
+        let queryString = `${data.searchBy}=true`;
 
-    if (data.geoLocation && data.geoLocation !== "") {
-      queryString += `&geoLocation=${data.geoLocation}`;
-    }
+        if (data.geoLocation && data.geoLocation !== "") {
+        queryString += `&geoLocation=${data.geoLocation}`;
+        }
 
-    if (data.medium && data.medium !== "") {
-      queryString += `&medium=${data.medium}`;
-    }
+        if (data.medium && data.medium !== "") {
+        queryString += `&medium=${data.medium}`;
+        }
 
-    queryString += `&isOnView=${data.isOnView}`;
-    queryString += `&isHighlight=${data.isHighlight}`;
-    queryString += `&q=${data.q}`;
+        queryString += `&isOnView=${data.isOnView}`;
+        queryString += `&isHighlight=${data.isHighlight}`;
+        queryString += `&q=${data.q}`;
 
-    setSearchHistory(current => [...current, queryString]);
+        setSearchHistory(await addToHistory(queryString));
 
-    router.push(`/artwork?${queryString}`);
-  };
+        router.push(`/artwork?${queryString}`);
+    };
 
 
     return (
