@@ -16,12 +16,16 @@ import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useAtom } from 'jotai';
 import { searchHistoryAtom } from '@/store';
 import { addToHistory } from '@/lib/userData';
+import { useState } from 'react';
+
 
 export default function AdvancedSearch() {
 
     const router = useRouter();
     const [searchHistory, setSearchHistory] = useAtom(searchHistoryAtom);
     const { register, handleSubmit } = useForm();
+
+
 
     const submitForm = async (data) => {
         let queryString = `${data.searchBy}=true`;

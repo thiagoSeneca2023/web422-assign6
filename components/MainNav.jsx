@@ -18,6 +18,9 @@ import { useAtom } from "jotai";
 import { addToHistory } from '@/lib/userData';
 import { searchHistoryAtom } from "@/store";
 import { useForm } from 'react-hook-form';
+import { removeToken, readToken } from '@/lib/authenticate';
+
+
 
 function navbar() {
   const router = useRouter();
@@ -26,6 +29,16 @@ function navbar() {
   const [searchHistory, setSearchHistory] = useAtom(searchHistoryAtom);
   const { register, handleSubmit } = useForm();
 
+
+  let token = readToken();
+  console.log(`THIS IS TOKEN ${token}`)
+
+
+  function logout() {
+      setIsExpanded(false);
+      removeToken();
+      router.push('/login');
+  }
 
   //TODO might need more work
   async function submitForm(e) {
@@ -55,9 +68,11 @@ function navbar() {
               <Link href="/" passHref legacyBehavior onClick={navLinkClicked}>
                 <Nav.Link>Home</Nav.Link>
               </Link>
+              {token &&
               <Link href="/search" passHref legacyBehavior onClick={navLinkClicked}>
                 <Nav.Link active={router.pathname === "/search"}>Advance Search</Nav.Link>
               </Link>
+              }
             </Nav>
             &nbsp;
             <Form onSubmit={submitForm} className="d-flex">
@@ -71,16 +86,26 @@ function navbar() {
                 <Button type='submit' variant="outline-success">Search</Button>
             </Form>
             &nbsp;
-            <Nav>
-              <NavDropdown title="User Name" id="basic-nav-dropdown">
+            {token && <Nav>
+              <NavDropdown title={token.userName} id="basic-nav-dropdown">
                 <Link href="/favorites" passHref legacyBehavior>
                   <NavDropdown.Item active={router.pathname === "/favorites"} onClick={navLinkClicked}>Favorites</NavDropdown.Item>
                 </Link>
                 <Link href="/history" passHref legacyBehavior>
                   <NavDropdown.Item active={router.pathname === "/history"} onClick={navLinkClicked}>Search History</NavDropdown.Item>
                 </Link>
+                <NavDropdown.Item onClick={() => logout()}>Logout</NavDropdown.Item>
               </NavDropdown>
-            </Nav>
+            </Nav> }
+
+            {!token && <Nav>
+                  <Link href="/login" passHref legacyBehavior>
+                    <Nav.Link active={router.pathname === "/login"} onClick={navLinkClicked}>LogIn</Nav.Link>
+                  </Link>
+                  <Link href="/register" passHref legacyBehavior>
+                    <Nav.Link active={router.pathname === "/register"} onClick={navLinkClicked}>Register</Nav.Link>
+                  </Link>
+              </Nav> }
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -90,4 +115,4 @@ function navbar() {
     );
   }
   
-export default navbar;
+export default navbar; 

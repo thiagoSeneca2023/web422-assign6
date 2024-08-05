@@ -17,18 +17,10 @@ import { SWRConfig } from 'swr';
 import RouteGuard from '@/components/RouteGuard';
 
 
-const fetcher = async (...args) => {
-  const response = await fetch(...args);
-
-  if (!response.ok) {
-    throw new Error(`Request failed with status: ${response.status}`);
-  }
-
-  return response.json(<RouteGuard><Layout><Component {...pageProps} /></Layout></RouteGuard>);
-};
 
 export default function App({ Component, pageProps }) {
   return (
+    <RouteGuard>
     <Layout>
       <SWRConfig value={{
         fetcher:
@@ -52,6 +44,6 @@ export default function App({ Component, pageProps }) {
         </Layout>
       </SWRConfig>
     </Layout>
-    
+    </RouteGuard>
   );
 }

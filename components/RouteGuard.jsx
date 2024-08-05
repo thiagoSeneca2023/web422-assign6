@@ -7,6 +7,7 @@ import { getFavorites, getHistory } from "@/lib/userData";
 
 
 export default function RouteGuard(props) {
+    const router = useRouter();
     const [favoritesList, setFavoritesList] = useAtom(favoritesAtom);
     const [searchHistory, setSearchHistory] = useAtom(searchHistoryAtom);
     const [authorized, setAuthorized] = useState(false);
